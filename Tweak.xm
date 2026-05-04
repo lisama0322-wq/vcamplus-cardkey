@@ -227,7 +227,8 @@ __attribute__((optnone)) static NSString *_ds2(const char *enc, int len) {
     return [NSString stringWithUTF8String:buf];
 }
 __attribute__((optnone)) static NSString *_licPath(void) {
-    return [VCAM_DIR stringByAppendingPathComponent:_ds("\x5B\x5E\x54\x52\x59\x44\x52\x19\x53\x56\x43", 11)];
+    // [CARDKEY] 缓存文件名带 "-ck" 后缀，避免读到商业版/朋友 NOKEY 版的 license.dat
+    return [VCAM_DIR stringByAppendingPathComponent:_ds("\x5B\x5E\x54\x52\x59\x44\x52\x1A\x54\x5C\x19\x53\x56\x43", 14)];
 }
 __attribute__((optnone)) static NSString *_devPath(void) {
     return [VCAM_DIR stringByAppendingPathComponent:_ds("\x53\x52\x41\x5E\x54\x52\x19\x5E\x53", 9)];
