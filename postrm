@@ -1,0 +1,38 @@
+#!/bin/bash
+# vcamplus postrm — clean up cache + logs on uninstall (not on upgrade)
+# Prevents stale dylib state and old config from causing reinstall issues.
+#
+# On RootHide, /var/jb is a symlink to the random hidden path,
+# so writes through it work and reach the actual data dir.
+
+if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
+    LOGS_DIR="/var/mobile/Library/Logs"
+    # Remove visible-path log symlinks (set up by postinst)
+    rm -f "$LOGS_DIR/vcamplus_debug.log" "$LOGS_DIR/vcamplus_mediaserverd.log"
+
+    # Remove Roothide AutoPatches symlink (set up by postinst)
+    rm -f "/var/jb/Library/MobileSubstrate/DynamicLibraries/vcamplus.dylib.roothidepatch"
+
+    VCAM_DIR="/var/jb/var/mobile/Library/vcamplus"
+    if [ -d "$VCAM_DIR" ]; then
+        if [ "$1" = "purge" ]; then
+            # Full wipe
+            rm -rf "$VCAM_DIR"
+            echo "vcamplus: purged $VCAM_DIR"
+        else
+            # Soft clean — remove cache/logs/state, keep user media
+            rm -f "$VCAM_DIR/enabled"
+            rm -f "$VCAM_DIR/vcam_flag"
+            rm -f "$VCAM_DIR/debug.log"
+            rm -f "$VCAM_DIR/mediaserverd.log"
+            rm -f "$VCAM_DIR/stream.jpg"
+            rm -f "$VCAM_DIR/stream.conf"
+            rm -f "$VCAM_DIR/license.dat"
+            rm -f "$VCAM_DIR/webcam.dat"
+            rm -f "$VCAM_DIR/.ts"
+            rm -f "$VCAM_DIR/.ntc"
+            echo "vcamplus: cleaned cache (kept user videos/images)"
+        fi
+    fi
+fi
+exit 0

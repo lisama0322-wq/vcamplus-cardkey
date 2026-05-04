@@ -1,0 +1,9 @@
+Package: com.vcamplus.tweak.cardkey
+Name: 虚拟相机离线卡密版
+Version: 1.0.0
+Architecture: iphoneos-arm64
+Depends: firmware (>= 15.0)
+Description: 离线卡密版（无需联网验证，输入授权码即可激活）。仅支持iOS 15-16 Dopamine rootless 越狱，需先安装 ElleKit。
+Author: VCam2026
+Maintainer: VCam2026
+Section: Tweaks

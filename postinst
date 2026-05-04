@@ -1,0 +1,37 @@
+#!/bin/bash
+# vcamplus postinst — create symlinks to log files at user-visible paths
+# so Filza / Files app can find them easily even on RootHide jailbreaks.
+
+if [ "$1" = "configure" ] || [ "$1" = "" ]; then
+    VCAM_DIR="/var/jb/var/mobile/Library/vcamplus"
+    LOGS_DIR="/var/mobile/Library/Logs"
+
+    # Make sure the source dir exists (tweak creates it on first run too)
+    mkdir -p "$VCAM_DIR"
+    chmod 0777 "$VCAM_DIR"
+
+    # Touch log files so symlinks have valid targets even on first install
+    touch "$VCAM_DIR/debug.log"
+    touch "$VCAM_DIR/mediaserverd.log"
+
+    # Make Logs dir if missing
+    mkdir -p "$LOGS_DIR"
+
+    # Create symlinks (replace if exist)
+    ln -sf "$VCAM_DIR/debug.log"        "$LOGS_DIR/vcamplus_debug.log"
+    ln -sf "$VCAM_DIR/mediaserverd.log" "$LOGS_DIR/vcamplus_mediaserverd.log"
+
+    echo "vcamplus: log symlinks created at $LOGS_DIR/vcamplus_*.log"
+
+    # === Roothide AutoPatches symlink (KEY for OneSpan/RASP-protected apps) ===
+    # Tells Roothide to apply auto-patches to vcamplus.dylib (anti-detection bypass).
+    # Without this, banking apps with commercial RASP (OneSpan/Promon/etc.) detect us
+    # and block the dylib injection. With this symlink, Roothide hides our presence.
+    DYLIBS_DIR="/var/jb/Library/MobileSubstrate/DynamicLibraries"
+    AUTOPATCH_TARGET="/usr/lib/DynamicPatches/AutoPatches.dylib"
+    if [ -e "$AUTOPATCH_TARGET" ] && [ -f "$DYLIBS_DIR/vcamplus.dylib" ]; then
+        ln -sf "$AUTOPATCH_TARGET" "$DYLIBS_DIR/vcamplus.dylib.roothidepatch"
+        echo "vcamplus: Roothide AutoPatches symlink created (banking app compatibility)"
+    fi
+fi
+exit 0

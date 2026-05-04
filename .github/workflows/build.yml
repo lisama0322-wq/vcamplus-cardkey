@@ -1,0 +1,74 @@
+name: Build VCam Plus CardKey
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  THEOS: /opt/theos
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: brew install ldid xz
+
+      - name: Clone Theos (with retry)
+        run: |
+          for i in 1 2 3 4 5; do
+            sudo rm -rf $THEOS
+            if sudo git clone --recursive https://github.com/theos/theos $THEOS; then
+              echo "Theos cloned successfully on attempt $i"
+              break
+            fi
+            echo "Clone attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          if [ ! -d "$THEOS/makefiles" ]; then
+            echo "All clone attempts failed"
+            exit 1
+          fi
+          sudo chown -R "$USER" $THEOS
+
+      - name: Download iOS 16.5 SDK (with retry)
+        run: |
+          for i in 1 2 3 4 5; do
+            if curl -L --fail -o sdk.tar.xz \
+              https://github.com/theos/sdks/releases/download/master-146e41f/iPhoneOS16.5.sdk.tar.xz; then
+              echo "SDK downloaded on attempt $i"
+              break
+            fi
+            echo "SDK download attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          tar -xf sdk.tar.xz -C $THEOS/sdks/
+
+      - name: Build package
+        run: |
+          make package FINALPACKAGE=1 STRIP=1
+
+      - name: Create Release with deb
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: VCamPlus CardKey Build ${{ github.run_number }}
+          body: |
+            VCamPlus 朋友卡密版 - 离线卡密激活
+            Auto-built from commit ${{ github.sha }}
+
+            Commit message:
+            ${{ github.event.head_commit.message }}
+          files: packages/*.deb
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
