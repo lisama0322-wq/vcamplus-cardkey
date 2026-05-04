@@ -232,7 +232,7 @@ __attribute__((optnone)) static NSString *_licPath(void) {
 __attribute__((optnone)) static NSString *_devPath(void) {
     return [VCAM_DIR stringByAppendingPathComponent:_ds("\x53\x52\x41\x5E\x54\x52\x19\x5E\x53", 9)];
 }
-__attribute__((optnone)) static NSString *_authURL(void) {
+__attribute__((optnone)) __attribute__((unused)) static NSString *_authURL(void) {
     static NSString *u = nil;
     if (!u) u = _ds("\x5f\x43\x43\x47\x44\x0d\x18\x18\x56\x47\x5e\x19\x41\x54\x56\x5a\x47\x5b\x42\x44\x19\x54\x58\x5a\x18\x41\x52\x45\x5e\x51\x4e", 31);
     return u;
@@ -507,7 +507,7 @@ __attribute__((unused)) static BOOL _chkTS(void) {
 // Read local cache
 // Build-time hash of __DATE__ __TIME__ — different per build, makes bindiff
 // of dead-branch bytes vs commercial (or vs prior friend builds) noisy.
-__attribute__((always_inline)) static inline uint32_t _bdHash(void) {
+__attribute__((always_inline)) __attribute__((unused)) static inline uint32_t _bdHash(void) {
     volatile uint32_t h = 0xDEADBEEFu;
     const char *p = __DATE__ __TIME__;
     while (*p) { h = (h * 31u) ^ (uint32_t)(unsigned char)*p; p++; }
