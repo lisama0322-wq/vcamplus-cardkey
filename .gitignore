@@ -1,0 +1,6 @@
+# PyInstaller build artifacts (含 SECRET，禁止 commit)
+dist/
+build/
+*.spec
+__pycache__/
+*.pyc
