@@ -1166,7 +1166,7 @@ static void _shAct(void) {
         if (!top) return;
 
         UIAlertController *a = [UIAlertController alertControllerWithTitle:@"Virtual Camera 授权"
-            message:@"请输入授权码激活插件\n类型: 时卡/天卡/周卡/月卡/年卡\n一码一机，激活后绑定当前设备\n离线验证，无需联网"
+            message:@"请输入授权码激活插件"
             preferredStyle:UIAlertControllerStyleAlert];
 
         [a addTextFieldWithConfigurationHandler:^(UITextField *tf) {
